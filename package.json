@@ -1,6 +1,6 @@
 {
   "name": "beti",
-  "version": "1.2.2",
+  "version": "1.4.1",
   "description": "Seamlessly integrate smart masking and robust validation into your react-hook-form inputs. Get clean, unmasked values with full TypeScript support, built to work perfectly with shadcn/ui.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

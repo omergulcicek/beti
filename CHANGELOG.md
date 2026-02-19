@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.4.1] - 2026-02-19
+
+### Changed
+- Package name updated from `@omergulcicek/forms` to `beti`.
+
 ## [v1.4.0] - 2025-12-02
 
 ### Fixed
