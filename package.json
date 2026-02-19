@@ -1,0 +1,50 @@
+{
+  "name": "beti",
+  "version": "0.9.0",
+  "description": "Seamlessly integrate smart masking and robust validation into your react-hook-form inputs. Get clean, unmasked values with full TypeScript support, built to work perfectly with shadcn/ui.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "react-hook-form",
+    "input",
+    "mask",
+    "input-mask",
+    "regex",
+    "form",
+    "form-validation",
+    "validation",
+    "typescript",
+    "masked-input",
+    "text-input",
+    "shadcn"
+  ],
+  "author": "Ömer Gülçiçek",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-hook-form": ">=7.0.0",
+    "use-mask-input": ">=3.0.0"
+  },
+  "devDependencies": {
+    "typescript": ">=5.0.0",
+    "@types/react": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omergulcicek/beti.git"
+  },
+  "homepage": "https://omergulcicek-beti.vercel.app/",
+  "publishConfig": {
+    "access": "public"
+  }
+}
