@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FieldValues, Path, PathValue, useWatch } from 'react-hook-form';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FieldValues, Path, PathValue } from 'react-hook-form';
 import { processInput } from '../core/engine';
 import { VALIDATORS } from '../core/logic';
 import { PRESETS } from '../core/presets';
@@ -15,19 +15,14 @@ export function useBeti<
   form,
   schema,
 }: UseBetiProps<TFieldValues, TSchema>) {
-  const { setValue, control, register } = form;
-  const [isMounted, setIsMounted] = useState(false);
+  const { setValue, getValues, register, formState: { errors } } = form;
   const [focusedField, setFocusedField] = useState<string | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const cursorRequestRef = useRef<{ name: string; position: number } | null>(null);
   const fieldRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const isComposingRef = useRef(false);
 
-  const handleCursor = useCallback(() => {
+  useLayoutEffect(() => {
     if (cursorRequestRef.current) {
       const { name, position } = cursorRequestRef.current;
       const input = fieldRefs.current[name];
@@ -35,12 +30,6 @@ export function useBeti<
         input.setSelectionRange(position, position);
       }
       cursorRequestRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (cursorRequestRef.current) {
-      requestAnimationFrame(handleCursor);
     }
   });
 
@@ -54,76 +43,88 @@ export function useBeti<
     return config;
   }, []);
 
-  const schemaKeys = useMemo(() => Object.keys(schema), [schema]);
-  const watchedValues = useWatch({ 
-    control,
-    name: schemaKeys as any 
-  });
-
-  const values = useMemo(() => {
-    const v: Record<string, any> = {};
-    if (Array.isArray(watchedValues)) {
-      schemaKeys.forEach((key, i) => {
-        v[key] = watchedValues[i];
-      });
-    } else if (schemaKeys.length === 1) {
-       v[schemaKeys[0]] = watchedValues;
-    }
-    return v;
-  }, [watchedValues, schemaKeys]);
-
   const getEffectiveOptions = useCallback((options: BetiOptions, value: string): BetiOptions => {
     if (options.resolveMask) {
-      const resolvedMask = options.resolveMask(value, values, schema);
+      const currentValues = getValues();
+      const resolvedMask = options.resolveMask(value, currentValues, schema);
       if (resolvedMask) {
         return { ...options, mask: resolvedMask };
       }
     }
     return options;
-  }, [schema, values]);
+  }, [getValues, schema]);
+
+  // Sync input values with RHF values (Lazy Initialization & External Updates)
+  useLayoutEffect(() => {
+    for (const key in schema) {
+      const input = fieldRefs.current[key];
+      if (!input) continue;
+
+      const config = schema[key];
+      if (!config) continue;
+
+      const fieldName = key as unknown as Path<TFieldValues>;
+      const formValue = getValues(fieldName);
+
+      if (formValue !== undefined && formValue !== null) {
+        const stringValue = String(formValue);
+        const options = getMaskOptions(config);
+        const effectiveOptions = getEffectiveOptions(options, stringValue);
+        const { displayValue } = processInput(stringValue, effectiveOptions);
+
+        if (input.value !== displayValue) {
+          input.value = displayValue;
+        }
+      }
+    }
+  });
+
+  const updateField = useCallback((
+    name: Path<TFieldValues>,
+    value: string,
+    options: BetiOptions,
+    selectionStart: number | null,
+    inputElement: HTMLInputElement
+  ) => {
+    let previousDisplayValue = '';
+    const currentRawValue = getValues(name);
+    if (currentRawValue !== undefined && currentRawValue !== null) {
+       const oldEffectiveOptions = getEffectiveOptions(options, String(currentRawValue));
+       const { displayValue } = processInput(String(currentRawValue), oldEffectiveOptions);
+       previousDisplayValue = displayValue;
+    }
+
+    const effectiveOptions = getEffectiveOptions(options, value);
+    const { value: finalRawValue, displayValue: finalDisplayValue, cursorPosition, cardType } = processInput(
+        value, 
+        effectiveOptions, 
+        selectionStart,
+        previousDisplayValue
+    );
+
+    if (cardType && options.onCardTypeChange) {
+        options.onCardTypeChange(cardType);
+    }
+
+    inputElement.value = finalDisplayValue;
+    
+    setValue(name, finalRawValue as PathValue<TFieldValues, Path<TFieldValues>>, { 
+        shouldValidate: true, 
+        shouldDirty: true, 
+        shouldTouch: true 
+    });
+
+    cursorRequestRef.current = { name, position: cursorPosition };
+  }, [setValue, getValues, getEffectiveOptions]);
 
   const createChangeHandler = useCallback(
     (name: Path<TFieldValues>, options: BetiOptions) => {
       return (e: React.ChangeEvent<HTMLInputElement>) => {
         if (isComposingRef.current) return;
-
-        const input = e.target;
-        const newValue = input.value;
-        const selectionStart = input.selectionStart;
-
-        const effectiveOptions = getEffectiveOptions(options, newValue);
-
-        let previousDisplayValue = '';
-        const currentRawValue = values?.[name as string];
-        if (currentRawValue) {
-           const oldEffectiveOptions = getEffectiveOptions(options, String(currentRawValue));
-           const { displayValue } = processInput(String(currentRawValue), oldEffectiveOptions);
-           previousDisplayValue = displayValue;
-        }
-
-        const { value: finalRawValue, displayValue: finalDisplayValue, cursorPosition, cardType } = processInput(
-            newValue, 
-            effectiveOptions, 
-            selectionStart,
-            previousDisplayValue
-        );
-
-        if (cardType && options.onCardTypeChange) {
-            options.onCardTypeChange(cardType);
-        }
-
-        input.value = finalDisplayValue;
-        
-        setValue(name, finalRawValue as PathValue<TFieldValues, Path<TFieldValues>>, { 
-            shouldValidate: true, 
-            shouldDirty: true, 
-            shouldTouch: true 
-        });
-
-        cursorRequestRef.current = { name, position: cursorPosition };
+        updateField(name, e.target.value, options, e.target.selectionStart, e.target);
       };
     },
-    [setValue, getEffectiveOptions, values]
+    [updateField]
   );
 
   const createCompositionStartHandler = useCallback(() => {
@@ -136,47 +137,13 @@ export function useBeti<
     (name: Path<TFieldValues>, options: BetiOptions) => {
       return (e: React.CompositionEvent<HTMLInputElement>) => {
         isComposingRef.current = false;
-        
-        const input = e.currentTarget;
-        const newValue = input.value;
-        const selectionStart = input.selectionStart;
-        
-        const effectiveOptions = getEffectiveOptions(options, newValue);
-        
-        let previousDisplayValue = '';
-        const currentRawValue = values?.[name as string];
-        if (currentRawValue) {
-           const oldEffectiveOptions = getEffectiveOptions(options, String(currentRawValue));
-           const { displayValue } = processInput(String(currentRawValue), oldEffectiveOptions);
-           previousDisplayValue = displayValue;
-        }
-
-        const { value: finalRawValue, displayValue: finalDisplayValue, cursorPosition, cardType } = processInput(
-            newValue, 
-            effectiveOptions, 
-            selectionStart,
-            previousDisplayValue
-        );
-
-        if (cardType && options.onCardTypeChange) {
-            options.onCardTypeChange(cardType);
-        }
-
-        input.value = finalDisplayValue;
-        
-        setValue(name, finalRawValue as PathValue<TFieldValues, Path<TFieldValues>>, { 
-            shouldValidate: true, 
-            shouldDirty: true, 
-            shouldTouch: true 
-        });
-
-        cursorRequestRef.current = { name, position: cursorPosition };
+        updateField(name, e.currentTarget.value, options, e.currentTarget.selectionStart, e.currentTarget);
       };
     },
-    [setValue, getEffectiveOptions, values]
+    [updateField]
   );
 
-    const createKeyDownHandler = useCallback(
+  const createKeyDownHandler = useCallback(
     (name: Path<TFieldValues>, options: BetiOptions) => {
       return (e: React.KeyboardEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
@@ -194,28 +161,11 @@ export function useBeti<
           if (!rawDigits) return;
 
           const newRawDigits = rawDigits.slice(0, -1);
-          const effectiveOptions = getEffectiveOptions(options, newRawDigits);
-
-          const { value: finalRawValue, displayValue: finalDisplayValue, cardType } = processInput(
-            newRawDigits,
-            effectiveOptions
-          );
-
-          if (cardType && options.onCardTypeChange) {
-            options.onCardTypeChange(cardType);
-          }
-
-          setValue(name, finalRawValue as PathValue<TFieldValues, Path<TFieldValues>>, {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-          });
-
-          cursorRequestRef.current = { name, position: finalDisplayValue.length };
+          updateField(name, newRawDigits, options, null, input);
         }
       };
     },
-    [setValue, getEffectiveOptions]
+    [updateField]
   );
 
   const maskedFields = useMemo(() => {
@@ -226,8 +176,9 @@ export function useBeti<
       if (!config) continue;
 
       const options = getMaskOptions(config);
+      const fieldName = key as unknown as Path<TFieldValues>;
       
-      const { ref: rhfRef, name, onBlur: rhfOnBlur, ...rest } = register(key as unknown as Path<TFieldValues>, {
+      const { ref: rhfRef, name, onBlur: rhfOnBlur, ...rest } = register(fieldName, {
         validate: {
           betiFormat: (value) => {
             if (!options.validate) return true;
@@ -251,31 +202,23 @@ export function useBeti<
 
       const { onChange: _onChange, ...cleanRest } = rest;
 
+      const formValue = getValues(fieldName);
+      const stringValue = formValue !== undefined && formValue !== null ? String(formValue) : '';
+      const effectiveOptions = getEffectiveOptions(options, stringValue);
+      const { displayValue } = processInput(stringValue, effectiveOptions);
+
       const combinedRef = mergeRefs(rhfRef, (el: HTMLInputElement | null) => {
         fieldRefs.current[key] = el;
       });
 
-      const handleChange = createChangeHandler(key as unknown as Path<TFieldValues>, options);
-      const handleKeyDown = createKeyDownHandler(key as unknown as Path<TFieldValues>, options);
+      const handleChange = createChangeHandler(fieldName, options);
+      const handleKeyDown = createKeyDownHandler(fieldName, options);
       const handleCompositionStart = createCompositionStartHandler();
-      const handleCompositionEnd = createCompositionEndHandler(key as unknown as Path<TFieldValues>, options);
-
-      const formValue = values?.[key as string];
-      
-      let displayValue = '';
-      let rawValue = '';
-
-      if (formValue !== undefined && formValue !== null) {
-          const stringValue = String(formValue);
-          const effectiveOptions = getEffectiveOptions(options, stringValue);
-          const { displayValue: d, value: v } = processInput(stringValue, effectiveOptions);
-          
-          displayValue = d;
-          rawValue = v;
-      }
+      const handleCompositionEnd = createCompositionEndHandler(fieldName, options);
 
       const handleFocus = (_e: React.FocusEvent<HTMLInputElement>) => {
           setFocusedField(key);
+          const formValue = getValues(fieldName);
           if (formValue !== undefined && formValue !== null) {
              const stringValue = String(formValue);
              const effectiveOptions = getEffectiveOptions(options, stringValue);
@@ -292,9 +235,11 @@ export function useBeti<
           rhfOnBlur(e);
       };
 
-      fields[key as keyof TSchema] = {
+      const fieldObj: BetiField = {
         ...cleanRest,
         name,
+        value: displayValue,
+        rawValue: stringValue,
         ref: combinedRef,
         onChange: handleChange,
         onKeyDown: handleKeyDown,
@@ -302,19 +247,31 @@ export function useBeti<
         onCompositionEnd: handleCompositionEnd,
         onBlur: handleBlur,
         onFocus: handleFocus,
-        value: isMounted ? displayValue : '',
-        rawValue: isMounted ? rawValue : '',
         type: options.type || 'text',
         inputMode: options.inputMode || (options.currency ? 'decimal' : (options.mask ? 'tel' : 'text')),
         autoComplete: options.autoComplete ?? (options.type === 'email' ? 'email' : options.type === 'password' ? 'current-password' : 'off'),
-        'aria-invalid': !!form.formState.errors[key],
+        'aria-invalid': !!errors[key],
         'aria-describedby': options.mask ? `${name}-description` : undefined,
         title: options.mask,
-      } as unknown as BetiField;
+      };
+
+      fields[key as keyof TSchema] = fieldObj as any;
     }
 
     return fields as BetiFields<TSchema>;
-  }, [schema, register, values, createChangeHandler, createKeyDownHandler, createCompositionStartHandler, createCompositionEndHandler, getMaskOptions, getEffectiveOptions, isMounted, focusedField, form.formState.errors]);
+  }, [
+    schema, 
+    register, 
+    getValues, 
+    createChangeHandler, 
+    createKeyDownHandler, 
+    createCompositionStartHandler, 
+    createCompositionEndHandler, 
+    getMaskOptions, 
+    getEffectiveOptions, 
+    focusedField, 
+    errors
+  ]);
 
   return maskedFields;
 }

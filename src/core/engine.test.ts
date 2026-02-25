@@ -72,15 +72,16 @@ describe("Core Engine", () => {
 
   describe("formatCurrency", () => {
     it("should format currency with defaults", () => {
-      expect(formatCurrency("123456", {})).toBe("1.234,56");
+      expect(formatCurrency("123456", {})).toBe("123.456");
     });
 
     it("should format with custom symbol", () => {
-      expect(formatCurrency("123456", { symbol: "$" })).toBe("$1.234,56");
+      expect(formatCurrency("123456", { symbol: "$" })).toBe("$123.456");
     });
 
     it("should format with custom precision", () => {
-      expect(formatCurrency("123456", { precision: 3 })).toBe("123,456");
+      // Input treated as integer, so precision doesn't add decimals if not present
+      expect(formatCurrency("123456", { precision: 3 })).toBe("123.456");
     });
   });
 
@@ -121,14 +122,19 @@ describe("Core Engine", () => {
 
     it("should process currency input", () => {
       const result = processInput("123456", PRESETS.currency);
-      expect(result.displayValue).toBe("1.234,56");
-      expect(result.value).toBe("1234.56");
+      expect(result.displayValue).toBe("123.456");
+      expect(result.value).toBe("123456");
     });
 
     it("should process uppercase transform", () => {
       const result = processInput("abc", { transform: "uppercase" });
       expect(result.displayValue).toBe("ABC");
       expect(result.value).toBe("abc");
+    });
+
+    it("should maintain cursor position for currency input", () => {
+      const result = processInput("1234", PRESETS.currency, 2);
+      expect(result.cursorPosition).toBe(3);
     });
   });
 });

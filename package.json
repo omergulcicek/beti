@@ -54,6 +54,8 @@
     "node": ">=18"
   },
   "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
     "react-hook-form": ">=7"
   },
   "devDependencies": {
