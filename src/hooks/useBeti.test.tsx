@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useForm } from "react-hook-form";
 import { describe, it, expect } from "vitest";
 import { useBeti } from "./useBeti";
@@ -29,7 +29,7 @@ describe("useBeti", () => {
     expect(result.current.fields.phone.name).toBe("phone");
   });
 
-  it("should format initial value", () => {
+  it("should format initial value", async () => {
     const { result } = renderHook(() => {
       const form = useForm({
         defaultValues: {
@@ -47,7 +47,9 @@ describe("useBeti", () => {
       return { form, fields };
     });
 
-    expect(result.current.fields.phone.value).toBe("(555) 123 45 67");
+    await waitFor(() => {
+      expect(result.current.fields.phone.value).toBe("(555) 123 45 67");
+    });
   });
 
   it("should handle input change", async () => {

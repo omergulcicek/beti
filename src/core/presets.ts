@@ -1,16 +1,24 @@
 import { BetiOptions, BetiPreset } from '../types';
+import { MASKS } from './constants';
 
 export const PRESETS: Record<BetiPreset, BetiOptions> = {
   card: {
-    mask: '9999 9999 9999 9999',
+    mask: MASKS.CARD,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
     validate: true,
     validator: 'luhn',
+    resolveMask: (value: string) => {
+      const clean = value.replace(/\D/g, '');
+      if (clean.startsWith('34') || clean.startsWith('37')) {
+        return MASKS.AMEX;
+      }
+      return MASKS.CARD;
+    },
   },
   expiry: {
-    mask: '99/99',
+    mask: MASKS.EXPIRY,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
@@ -18,13 +26,35 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     validator: 'expiry',
   },
   cvv: {
-    mask: '999',
+    mask: MASKS.CVV_3,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
+    resolveMask: (_value: string, allValues?: any, schema?: any) => {
+       if (!allValues || !schema) return MASKS.CVV_3;
+       
+       let cardFieldValue = '';
+       for (const key in schema) {
+          const fieldConfig = schema[key];
+          const isCard = fieldConfig === 'card' || (typeof fieldConfig === 'object' && fieldConfig.preset === 'card') || (typeof fieldConfig === 'object' && fieldConfig.mask === MASKS.CARD);
+          
+          if (isCard) {
+             const val = allValues[key];
+             if (val) {
+                cardFieldValue = String(val).replace(/\D/g, '');
+                break;
+             }
+          }
+       }
+       
+       if (cardFieldValue.startsWith('34') || cardFieldValue.startsWith('37')) {
+          return MASKS.CVV_4;
+       }
+       return MASKS.CVV_3;
+    }
   },
   tckn: {
-    mask: '99999999999',
+    mask: MASKS.TCKN,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
@@ -32,7 +62,7 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     validator: 'tckn',
   },
   phone: {
-    mask: '(999) 999 99 99',
+    mask: MASKS.PHONE,
     allowedChars: /[0-9]/,
     inputMode: 'tel',
     type: 'tel',
@@ -81,7 +111,7 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     type: 'text',
   },
   iban: {
-    mask: '99 9999 9999 9999 9999 9999 99',
+    mask: MASKS.IBAN,
     displayPrefix: 'TR',
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
@@ -95,7 +125,7 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     type: 'tel',
   },
   date: {
-    mask: '99/99/9999',
+    mask: MASKS.DATE,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
@@ -104,7 +134,7 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     dateFormat: 'DMY',
   },
   taxNumber: {
-    mask: '9999999999',
+    mask: MASKS.TAX_NUMBER,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',
@@ -112,7 +142,7 @@ export const PRESETS: Record<BetiPreset, BetiOptions> = {
     validator: 'vkn',
   },
   zipCode: {
-    mask: '99999',
+    mask: MASKS.ZIP_CODE,
     allowedChars: /[0-9]/,
     inputMode: 'numeric',
     type: 'tel',

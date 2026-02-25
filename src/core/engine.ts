@@ -141,7 +141,6 @@ export function getCardType(cardNumber: string): 'visa' | 'mastercard' | 'amex' 
   
   if (clean.startsWith('4')) return 'visa';
   
-  // Check for Mastercard (starts with 51-55 or 2221-2720)
   const mastercardRegex = /^(5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[0-1]\d|2720)/;
   if (mastercardRegex.test(clean)) {
     return 'mastercard';
@@ -165,7 +164,7 @@ export function processInput(
   let processed = value;
   let cardType: 'visa' | 'mastercard' | 'amex' | 'troy' | 'unknown' | undefined;
 
-  if (mask === '9999 9999 9999 9999' || mask === '9999 999999 99999') {
+  if (options.onCardTypeChange) {
       cardType = getCardType(value);
   }
 
