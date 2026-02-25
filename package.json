@@ -1,50 +1,72 @@
 {
   "name": "beti",
-  "version": "1.4.1",
-  "description": "Seamlessly integrate smart masking and robust validation into your react-hook-form inputs. Get clean, unmasked values with full TypeScript support, built to work perfectly with shadcn/ui.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "1.0.0-beta.1",
+  "description": "A lightweight, zero-dependency masking library for React Hook Form",
+  "author": "Ömer Gülçiçek <iletisim@omergulcicek.com> (https://omergulcicek.com)",
+  "license": "MIT",
+  "homepage": "https://beti.omergulcicek.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omergulcicek/beti.git"
+  },
+  "bugs": {
+    "url": "https://github.com/omergulcicek/beti/issues"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
   "files": [
-    "dist",
-    "README.md",
-    "package.json"
+    "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "lint": "tsc"
   },
   "keywords": [
     "react",
     "react-hook-form",
-    "input",
-    "mask",
+    "masking",
     "input-mask",
-    "regex",
-    "form",
-    "form-validation",
-    "validation",
+    "zero-dependency",
     "typescript",
-    "masked-input",
-    "text-input",
-    "shadcn"
+    "shadcn-ui",
+    "form",
+    "validation",
+    "formatter",
+    "react-mask",
+    "hook",
+    "currency",
+    "credit-card",
+    "phone-mask",
+    "input"
   ],
-  "author": "Ömer Gülçiçek",
-  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-hook-form": ">=7.0.0",
-    "use-mask-input": ">=3.0.0"
+    "react-hook-form": ">=7"
   },
   "devDependencies": {
-    "typescript": ">=5.0.0",
-    "@types/react": ">=18.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/omergulcicek/beti.git"
-  },
-  "homepage": "https://omergulcicek-beti.vercel.app/",
-  "publishConfig": {
-    "access": "public"
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^28.1.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.50.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }
