@@ -1,4 +1,8 @@
-# 🛡️ Beti
+<div align="center">
+  <img src="./public/beti.svg" alt="Beti" width="160" />
+</div>
+
+# Beti
 
 **A lightweight, zero-dependency masking library for React Hook Form.**
 
