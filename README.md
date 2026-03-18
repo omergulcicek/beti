@@ -1,89 +1,78 @@
 <div align="center">
-  <img src="./public/beti.svg" alt="Beti" width="160" />
+  <img src="./public/hero.jpg" alt="Vira Stack Mask" />
 </div>
 
-# Beti
+<br />
 
-**A lightweight, zero-dependency masking library for React Hook Form.**
+<div align="center">
+  <a href="https://www.npmjs.com/package/@virastack/input-mask">
+    <img src="https://img.shields.io/npm/v/@virastack/input-mask?style=flat-square&color=black" alt="npm version" />
+  </a>
+  <a href="https://www.npmjs.com/package/@virastack/input-mask">
+    <img src="https://img.shields.io/npm/dt/@virastack/input-mask?style=flat-square&color=black" alt="npm downloads" />
+  </a>
+  <a href="https://bundlephobia.com/package/@virastack/input-mask">
+    <img src="https://img.shields.io/bundlephobia/minzip/@virastack/input-mask?style=flat-square&color=black" alt="bundle size" />
+  </a>
+</div>
 
-Beti is a high-performance, ultra-lightweight (<5KB) masking library designed for modern React applications. It provides a seamless way to handle complex input masking while keeping your form state clean and your UI butter-smooth.
+<br />
 
-![npm](https://img.shields.io/npm/v/@vassale/beti)
-![bundlephobia](https://img.shields.io/bundlephobia/minzip/@vassale/beti)
-![types](https://img.shields.io/npm/types/@vassale/beti)
-![license](https://img.shields.io/npm/l/@vassale/beti)
-![npm downloads](https://img.shields.io/npm/dw/@vassale/beti)
+# ViraStack Input Mask
 
-## 🚀 Live Demo & Documentation
+The lightweight standard for input formatting and state synchronization in React.
 
-For interactive demos, full API reference, and advanced usage examples, visit:
+- 🚀 **Ultra-lightweight:** Less than 5KB minified & zipped.
+- ⚛️ **React-First:** Seamless integration with React Hook Form.
+- 🛡️ **Type-Safe:** Built with TypeScript for an excellent developer experience.
+- 🧠 **Smart Presets:** Built-in masks for credit cards, phones, currency, and more.
 
-👉 **[beti.omergulcicek.com](https://beti.omergulcicek.com)**
+### [Read the docs →](https://virastack.com/mask)
 
----
-
-## ✨ Why Beti?
-
-Most masking libraries are heavy, manipulate the DOM directly, or mess up the cursor position. Beti was built to solve these with a "React-First" mindset.
-
-* **🪶 Zero Dependencies:** No `inputmask`, no `jquery`. Pure, optimized logic.
-* **🧹 Clean State Philosophy:** Stores the raw, unmasked value in your state, but displays the masked version in the UI.
-* **⚛️ React 19 & Next.js Ready:** Built with `'use client'` and compatible with Server Components and the latest React 19 ref patterns.
-* **🎯 Cursor Intelligence:** Advanced cursor position management prevents "jumping" when editing in the middle of a value.
-* **🚀 Ultra Fast:** Optimized with `useMemo` and `requestAnimationFrame` for a zero-lag experience.
-* **🛡️ Built-in Validation:** Includes algorithmic validators for Credit Cards (Luhn), TCKN, IBAN, and more.
-* **💳 Smart Detection:** Auto-detects credit card types (Visa, Mastercard, Amex, Troy) and formats accordingly.
-
-## 🚀 Installation
+## Quick Start
 
 ```bash
-npm install @vassale/beti
+npm install @virastack/input-mask
 ```
 
-## 🛠️ Quick Start
-
-Beti uses a Schema-based approach to keep your JSX clean. Define your masks once, and spread them into your inputs.
-
 ```tsx
-import { useBeti } from '@vassale/beti';
 import { useForm } from 'react-hook-form';
+import { useViraMask } from '@virastack/input-mask';
 
-const MyForm = () => {
+function App() {
   const form = useForm();
   
-  const fields = useBeti({
+  const { phone } = useViraMask({
     form,
     schema: {
-      phone: 'phone',
-      // Add more fields here...
+      phone: 'phone'
     }
   });
 
   return (
     <form>
-      <input {...fields.phone} />
+      <input {...phone} placeholder="(555) 555 55 55" />
     </form>
   );
-};
+}
 ```
 
-## 📦 Features & Presets
+## Explore the ViraStack Ecosystem
 
-Beti comes with a rich set of presets and configuration options. 
+- [**AI Rules**](https://github.com/virastack/ai-rules) – Standardized AI rules for consistent code generation
+- [**Next.js Boilerplate**](https://github.com/virastack/nextjs-boilerplate) – Full-featured, scalable Next.js starter kit
+- [**Input Mask**](https://github.com/virastack/input-mask) – Lightweight, zero-dependency input masking library
+- [**Password Toggle**](https://github.com/virastack/password-toggle) – Accessible, headless password visibility component
 
-* **Presets:** `card`, `phone`, `currency`, `iban`, `tckn`, `date`, `time`, `numeric`, `alpha`, `email`, `url`, `username`, `taxNumber`, `zipCode`...
-* **Advanced Options:**
-    * `displayPrefix` (e.g., fixed "TR" for IBAN)
-    * `onCardTypeChange` (Detect Visa/Mastercard/Troy/Amex)
-    * `currency` (Symbol, precision, separators)
-    * `transform` (Uppercase/Lowercase)
-    * `allowedChars` / `forbiddenChars` (Regex based filtering)
-    * `validate` (Built-in algorithmic validation)
+... and more at [**virastack.com**](https://virastack.com)
 
-For the full list of features and customization options, please check the **[official documentation](https://beti.omergulcicek.com)**.
+---
 
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-Built with ❤️ by [Ömer Gülçiçek](https://omergulcicek.com)
+<div align="center">
+  <p>Built with precision by <a href="https://omergulcicek.com"><b>Ömer Gülçiçek</b></a></p>
+  <p>
+    <a href="https://github.com/omergulcicek">
+      <img src="https://img.shields.io/github/followers/omergulcicek?label=Follow&style=social" alt="Follow Ömer Gülçiçek" />
+    </a>
+  </p>
+</div>

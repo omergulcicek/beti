@@ -1,9 +1,9 @@
-import { BetiOptions } from '../../types';
+import { MaskOptions } from '../../types';
 import { cleanValue } from '../../utils/string';
 
 export function processDefault(
   value: string,
-  options: BetiOptions,
+  options: MaskOptions,
   selectionStart: number | null,
   cardType?: 'visa' | 'mastercard' | 'amex' | 'troy' | 'unknown'
 ) {

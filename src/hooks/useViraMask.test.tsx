@@ -2,12 +2,12 @@ import { renderHook, act, waitFor, render, screen } from "@testing-library/react
 import React from 'react';
 import { useForm } from "react-hook-form";
 import { describe, it, expect } from "vitest";
-import { useBeti } from "./useBeti";
+import { useViraMask } from "./useViraMask";
 import { PRESETS } from "../core/presets";
 
 window.requestAnimationFrame = (cb: FrameRequestCallback) => setTimeout(cb, 0);
 
-describe("useBeti", () => {
+describe("useViraMask", () => {
   it("should initialize correctly", () => {
     const { result } = renderHook(() => {
       const form = useForm({
@@ -16,7 +16,7 @@ describe("useBeti", () => {
         },
       });
       
-      const fields = useBeti({
+      const fields = useViraMask({
         form,
         schema: {
           phone: PRESETS.phone,
@@ -38,7 +38,7 @@ describe("useBeti", () => {
         },
       });
       
-      const fields = useBeti({
+      const fields = useViraMask({
         form,
         schema: {
           phone: PRESETS.phone,
@@ -64,7 +64,7 @@ describe("useBeti", () => {
         },
       });
       
-      const fields = useBeti({
+      const fields = useViraMask({
         form,
         schema: {
           phone: PRESETS.phone,

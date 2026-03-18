@@ -1,7 +1,7 @@
-import { BetiOptions, BetiPreset } from '../types';
+import { MaskOptions, MaskPreset } from '../types';
 import { MASKS } from './constants';
 
-export const PRESETS: Record<BetiPreset, BetiOptions> = {
+export const PRESETS: Record<MaskPreset, MaskOptions> = {
   card: {
     mask: MASKS.CARD,
     allowedChars: /[0-9]/,

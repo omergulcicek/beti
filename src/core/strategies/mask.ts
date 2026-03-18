@@ -1,4 +1,4 @@
-import { BetiOptions } from '../../types';
+import { MaskOptions } from '../../types';
 import { cleanValue } from '../../utils/string';
 
 export function applyMask(value: string, mask: string): string {
@@ -75,7 +75,7 @@ export function stripMask(value: string, mask: string): string {
 
 export function processMask(
   value: string,
-  options: BetiOptions,
+  options: MaskOptions,
   selectionStart: number | null,
   previousValue: string,
   cardType?: 'visa' | 'mastercard' | 'amex' | 'troy' | 'unknown'

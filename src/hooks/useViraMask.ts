@@ -6,16 +6,16 @@ import { processInput } from '../core/engine';
 import { VALIDATORS } from '../core/logic';
 import { PRESETS } from '../core/presets';
 import { formatCurrency } from '../core/strategies/currency';
-import { BetiField, BetiFields, BetiOptions, BetiPreset, BetiSchema, UseBetiProps } from '../types';
+import { MaskField, MaskFields, MaskOptions, MaskPreset, MaskSchema, UseViraMaskProps } from '../types';
 import { mergeRefs } from '../utils/ref';
 
-export function useBeti<
+export function useViraMask<
   TFieldValues extends FieldValues,
-  TSchema extends BetiSchema<TFieldValues>
+  TSchema extends MaskSchema<TFieldValues>
 >({
   form,
   schema,
-}: UseBetiProps<TFieldValues, TSchema>) {
+}: UseViraMaskProps<TFieldValues, TSchema>) {
   const { setValue, getValues, register, formState: { errors } } = form;
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export function useBeti<
     }
   });
 
-  const getMaskOptions = useCallback((config: BetiPreset | BetiOptions): BetiOptions => {
+  const getMaskOptions = useCallback((config: MaskPreset | MaskOptions): MaskOptions => {
     if (typeof config === 'string') {
       return PRESETS[config] || {};
     }
@@ -49,7 +49,7 @@ export function useBeti<
     return config;
   }, []);
 
-  const getEffectiveOptions = useCallback((options: BetiOptions, value: string): BetiOptions => {
+  const getEffectiveOptions = useCallback((options: MaskOptions, value: string): MaskOptions => {
     if (options.resolveMask) {
       const currentValues = getValues();
       const resolvedMask = options.resolveMask(value, currentValues, schema);
@@ -94,7 +94,7 @@ export function useBeti<
   const updateField = useCallback((
     name: Path<TFieldValues>,
     value: string,
-    options: BetiOptions,
+    options: MaskOptions,
     selectionStart: number | null,
     inputElement: HTMLInputElement
   ) => {
@@ -133,7 +133,7 @@ export function useBeti<
   }, [setValue, getValues, getEffectiveOptions]);
 
   const createChangeHandler = useCallback(
-    (name: Path<TFieldValues>, options: BetiOptions) => {
+    (name: Path<TFieldValues>, options: MaskOptions) => {
       return (e: React.ChangeEvent<HTMLInputElement>) => {
         if (isComposingRef.current) return;
         updateField(name, e.target.value, options, e.target.selectionStart, e.target);
@@ -149,7 +149,7 @@ export function useBeti<
   }, []);
 
   const createCompositionEndHandler = useCallback(
-    (name: Path<TFieldValues>, options: BetiOptions) => {
+    (name: Path<TFieldValues>, options: MaskOptions) => {
       return (e: React.CompositionEvent<HTMLInputElement>) => {
         isComposingRef.current = false;
         updateField(name, e.currentTarget.value, options, e.currentTarget.selectionStart, e.currentTarget);
@@ -159,7 +159,7 @@ export function useBeti<
   );
 
   const createKeyDownHandler = useCallback(
-    (name: Path<TFieldValues>, options: BetiOptions) => {
+    (name: Path<TFieldValues>, options: MaskOptions) => {
       return (e: React.KeyboardEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
         const { selectionStart, selectionEnd, value } = input;
@@ -184,7 +184,7 @@ export function useBeti<
   );
 
   const maskedFields = useMemo(() => {
-    const fields: Partial<BetiFields<TSchema>> = {};
+    const fields: Partial<MaskFields<TSchema>> = {};
 
     for (const key in schema) {
       const config = schema[key];
@@ -195,7 +195,7 @@ export function useBeti<
       
       const { ref: rhfRef, name, onBlur: rhfOnBlur, ...rest } = register(fieldName, {
         validate: {
-          betiFormat: (value) => {
+          maskFormat: (value) => {
             if (!options.validate) return true;
             if (!value) return true;
 
@@ -257,7 +257,7 @@ export function useBeti<
           rhfOnBlur(e);
       };
 
-      const fieldObj: BetiField = {
+      const fieldObj: MaskField = {
         ...cleanRest,
         name,
         value: displayValue,
@@ -280,7 +280,7 @@ export function useBeti<
       fields[key as keyof TSchema] = fieldObj as any;
     }
 
-    return fields as BetiFields<TSchema>;
+    return fields as MaskFields<TSchema>;
   }, [
     schema, 
     register, 

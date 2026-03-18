@@ -1,16 +1,20 @@
 {
-  "name": "@vassale/beti",
-  "version": "1.1.0",
+  "name": "@virastack/input-mask",
+  "version": "1.0.0",
   "description": "A lightweight, zero-dependency masking library for React Hook Form",
-  "author": "Ömer Gülçiçek <iletisim@omergulcicek.com> (https://omergulcicek.com)",
+  "author": {
+    "name": "Ömer Gülçiçek (ViraStack)",
+    "email": "iletisim@omergulcicek.com",
+    "url": "https://omergulcicek.com"
+  },
   "license": "MIT",
-  "homepage": "https://beti.omergulcicek.com",
+  "homepage": "https://virastack.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vassale/beti.git"
+    "url": "git+https://github.com/virastack/input-mask.git"
   },
   "bugs": {
-    "url": "https://github.com/vassale/beti/issues"
+    "url": "https://github.com/virastack/input-mask/issues"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -22,10 +26,13 @@
       "require": "./dist/index.js"
     }
   },
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -33,26 +40,19 @@
     "lint": "tsc"
   },
   "keywords": [
+    "virastack",
     "react",
-    "react-hook-form",
-    "masking",
     "input-mask",
-    "zero-dependency",
-    "typescript",
-    "shadcn-ui",
-    "form",
-    "validation",
+    "masking",
+    "react-hook-form",
     "formatter",
-    "react-mask",
-    "hook",
-    "currency",
-    "credit-card",
     "phone-mask",
-    "input"
+    "currency-mask",
+    "credit-card-mask",
+    "shadcn-ui",
+    "typescript",
+    "dx"
   ],
-  "engines": {
-    "node": ">=18"
-  },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",

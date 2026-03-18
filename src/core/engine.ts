@@ -1,4 +1,4 @@
-import { BetiOptions } from '../types';
+import { MaskOptions } from '../types';
 import { slugify, cleanValue as cleanValueUtil } from '../utils/string';
 import { processCurrency, formatCurrency as formatCurrencyStrategy, unformatCurrency as unformatCurrencyStrategy } from './strategies/currency';
 import { processMask, applyMask as applyMaskStrategy, unmask as unmaskStrategy, stripMask as stripMaskStrategy } from './strategies/mask';
@@ -17,7 +17,7 @@ export const getCardType = getCardTypeStrategy;
 
 export function processInput(
   value: string, 
-  options: BetiOptions, 
+  options: MaskOptions, 
   selectionStart: number | null = null,
   previousValue: string = ''
 ): { value: string; displayValue: string; cursorPosition: number; cardType?: 'visa' | 'mastercard' | 'amex' | 'troy' | 'unknown' } {

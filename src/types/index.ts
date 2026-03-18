@@ -6,7 +6,7 @@ import {
 } from "react";
 import { FieldValues, UseFormReturn } from "react-hook-form";
 
-export type BetiPreset =
+export type MaskPreset =
   | "card"
   | "expiry"
   | "cvv"
@@ -33,7 +33,7 @@ export interface CurrencyOptions {
   symbolPosition?: "prefix" | "suffix";
 }
 
-export interface BetiOptions {
+export interface MaskOptions {
   mask?: string;
   transform?: "uppercase" | "lowercase";
   allowedChars?: RegExp;
@@ -66,22 +66,22 @@ export interface BetiOptions {
   alphaFormat?: boolean;
   usernameFormat?: boolean;
   displayPrefix?: string;
-  preset?: BetiPreset;
+  preset?: MaskPreset;
   onCardTypeChange?: (
     type: "visa" | "mastercard" | "amex" | "troy" | "unknown",
   ) => void;
-  resolveMask?: (value: string, allValues?: any, schema?: BetiSchema<any>) => string | undefined;
+  resolveMask?: (value: string, allValues?: any, schema?: MaskSchema<any>) => string | undefined;
 }
 
-export interface BetiPresetConfig extends BetiOptions {
-  type: BetiPreset;
+export interface MaskPresetConfig extends MaskOptions {
+  type: MaskPreset;
 }
 
-export type BetiSchema<TFieldValues extends FieldValues> = {
-  [K in keyof TFieldValues]?: BetiPreset | BetiOptions;
+export type MaskSchema<TFieldValues extends FieldValues> = {
+  [K in keyof TFieldValues]?: MaskPreset | MaskOptions;
 };
 
-export interface BetiField {
+export interface MaskField {
   ref: RefCallback<HTMLInputElement>;
   name: string;
   value: string;
@@ -107,13 +107,13 @@ export interface BetiField {
   title?: string;
 }
 
-export type BetiFields<TSchema> = {
-  [K in keyof TSchema]: BetiField;
+export type MaskFields<TSchema> = {
+  [K in keyof TSchema]: MaskField;
 };
 
-export interface UseBetiProps<
+export interface UseViraMaskProps<
   TFieldValues extends FieldValues,
-  TSchema extends BetiSchema<TFieldValues>,
+  TSchema extends MaskSchema<TFieldValues>,
 > {
   form: UseFormReturn<TFieldValues>;
   schema: TSchema;
